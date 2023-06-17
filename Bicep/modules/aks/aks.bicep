@@ -39,6 +39,9 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-06-02-previ
         type: 'VirtualMachineScaleSets'
         vnetSubnetID: subnetId  // Uncomment this to configure VNET
         enableNodePublicIP:false
+        nodeTaints: [
+          'CriticalAddonsOnly=true:NoSchedule'
+        ]
       }
     ]
 
@@ -99,25 +102,23 @@ resource aksarmpool 'Microsoft.ContainerService/managedClusters/agentPools@2023-
   name: 'armpool'
   parent: aksCluster
   properties: {
- 
     count: 1
     enableAutoScaling: true
     enableNodePublicIP: false
-
     maxCount: 5
     minCount: 1
     maxPods: 50
     mode: 'user'
-
-    nodeLabels: {}
-
+    nodeLabels: {
+      'os-sku' : 'AzureLinux'
+    }
+    nodeTaints: [
+      'os-sku=AzureLinux:NoSchedule'
+    ]
     osSKU: 'AzureLinux'
     osType: 'Linux'
-   
-  
     tags: {}
     type: 'VirtualMachineScaleSets'
-
     vmSize: 'Standard_D2pds_v5'
     vnetSubnetID: subnetId
   }
@@ -126,6 +127,31 @@ resource aksarmpool 'Microsoft.ContainerService/managedClusters/agentPools@2023-
 
 
 
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+
+resource aksstandardpool 'Microsoft.ContainerService/managedClusters/agentPools@2023-03-02-preview' = {
+  name: 'standardpool'
+  parent: aksCluster
+  properties: {
+    count: 1
+    enableAutoScaling: true
+    enableNodePublicIP: false
+    maxCount: 5
+    minCount: 1
+    maxPods: 50
+    mode: 'user'
+    nodeLabels: {
+      'os-sku' : 'Ubuntu'
+    }
+    osSKU: 'Ubuntu'
+    osType: 'Linux'
+    tags: {}
+    type: 'VirtualMachineScaleSets'
+    vmSize: 'Standard_D4s_v3'
+    vnetSubnetID: subnetId
+  }
+}
 
 
 
