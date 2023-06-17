@@ -27,11 +27,11 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-06-02-previ
     agentPoolProfiles: [
       {
         name: 'default'
-        count: 2
+        count: 1
         vmSize: 'Standard_D4s_v3'
         mode: 'System'
         maxCount: 5
-        minCount: 2
+        minCount: 1
         osType: 'Linux'
         osSKU: 'Ubuntu'
         enableAutoScaling:true
@@ -73,34 +73,55 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-06-02-previ
       }
     }
     
-    podIdentityProfile: {
-      enabled: true
-      userAssignedIdentities: [
-        {
-          bindingSelector: podBindingSelector
-          identity: {
-            clientId: clientId
-            resourceId: identityid
-            objectId: principalId
-          }
-          name: podIdentityName
-          namespace: podIdentityNamespace
-        }
-      ]
-      userAssignedIdentityExceptions: [
-        {
-          name: 'string'
-          namespace: 'string'
-          podLabels: {}
-        }
-      ]
+    workloadAutoScalerProfile: {
+      keda: {
+        enabled: true
+      }
+      verticalPodAutoscaler: {
+        controlledValues: 'RequestsAndLimits'
+        enabled: true
+        updateMode: 'Off'
+      }
     }
+
     disableLocalAccounts: false
   }
 }
 
 
 
+
+
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+
+resource aksarmpool 'Microsoft.ContainerService/managedClusters/agentPools@2023-03-02-preview' = {
+  name: 'armpool'
+  parent: aksCluster
+  properties: {
+ 
+    count: 1
+    enableAutoScaling: true
+    enableNodePublicIP: false
+
+    maxCount: 5
+    minCount: 1
+    maxPods: 50
+    mode: 'user'
+
+    nodeLabels: {}
+
+    osSKU: 'AzureLinux'
+    osType: 'Linux'
+   
+  
+    tags: {}
+    type: 'VirtualMachineScaleSets'
+
+    vmSize: 'Standard_D2pds_v5'
+    vnetSubnetID: subnetId
+  }
+}
 
 
 

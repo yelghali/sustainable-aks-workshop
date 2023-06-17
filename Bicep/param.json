@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "rgName": {
-      "value": "{Resource Group Name}"
+      "value": "sustainable-aks"
     },    
     "cosmosName" :{
-      "value": "{Cosmos DB Account Name}"
+      "value": "cosmos-sustainable-aks"
     },
     "acrName" :{
-      "value": "{ACR Name}"
+      "value": "acrsustainableaks"
 	},
     "throughput" :{
         "value": 11000
